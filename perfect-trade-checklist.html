@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Perfect Trade</title>
+
+<!-- PWA Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Perfect Trade">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="The Perfect Trade Check-List — Trend Line Strategy">
+
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22The%20Perfect%20Trade%22%2C%22short_name%22%3A%22Trade%20CL%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080808%22%2C%22theme_color%22%3A%22%23080808%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%200%20512%20512'%253E%253Crect%2520width%3D'512'%2520height%3D'512'%2520fill%3D'%23080808'%2F%253E%253Ctext%2520x%3D'256'%2520y%3D'320'%2520font-size%3D'280'%2520text-anchor%3D'middle'%2520fill%3D'%23b8965a'%253E%E2%9C%93%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+<!-- Apple Touch Icon (inline SVG as data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23080808'/><text x='256' y='200' font-size='120' text-anchor='middle' fill='%23b8965a' font-family='serif' font-style='italic'>The</text><text x='256' y='320' font-size='96' text-anchor='middle' fill='%23f5f5f5' font-family='serif' font-weight='bold'>TRADE</text><line x1='80' y1='355' x2='432' y2='355' stroke='%23b8965a' stroke-width='3'/><text x='256' y='400' font-size='52' text-anchor='middle' fill='%23888' font-family='monospace'>CHECK-LIST</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne+Mono&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --ink: #080808;
+  --surface: #131313;
+  --lift: #1a1a1a;
+  --rule: #222222;
+  --mid: #333333;
+  --muted: #555555;
+  --sub: #888888;
+  --ghost: #aaaaaa;
+  --silver: #cccccc;
+  --chalk: #e8e8e8;
+  --white: #f5f5f5;
+  --gold: #b8965a;
+  --gold-dim: rgba(184,150,90,0.1);
+  --gold-line: rgba(184,150,90,0.28);
+  --green-text: #7aab8a;
+  --green-bg: rgba(80,140,100,0.07);
+  --green-border: rgba(80,140,100,0.22);
+  --red-text: #ab7a7a;
+  --red-bg: rgba(140,80,80,0.07);
+  --red-border: rgba(140,80,80,0.22);
+  --amber: #c4a052;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--ghost);
+  font-family: 'Syne', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* scanlines */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none; z-index: 9999;
+}
+/* noise */
+body::before {
+  content: '';
+  position: fixed; inset: -50%; width: 200%; height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9998; opacity: 0.6;
+  animation: drift 25s linear infinite;
+}
+@keyframes drift { from { transform: translate(0,0); } to { transform: translate(-150px,-150px); } }
+
+.page { max-width: 800px; margin: 0 auto; padding: 0 32px 140px; padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); padding-top: env(safe-area-inset-top, 0px); position: relative; z-index: 1; }
+
+/* ─── MASTHEAD ─── */
+.masthead { padding-top: 64px; margin-bottom: 48px; opacity: 0; transform: translateY(20px); animation: rise 0.7s ease 0.05s forwards; }
+.mast-rule { width: 100%; height: 1px; background: linear-gradient(90deg, var(--gold) 0%, var(--gold-line) 35%, transparent 100%); margin-bottom: 28px; position: relative; }
+.mast-rule::before { content: ''; position: absolute; left: 0; top: -3px; width: 5px; height: 7px; background: var(--gold); }
+.mast-eyebrow { display: flex; align-items: center; gap: 20px; margin-bottom: 18px; }
+.ey-label { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); }
+.ey-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+.ey-sub { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.mast-h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(62px, 12vw, 108px); line-height: 0.87; letter-spacing: -0.01em; color: var(--chalk); }
+.mast-h1 em { font-style: italic; color: var(--sub); }
+.mast-h1 .word { display: block; color: var(--white); font-weight: 600; }
+.mast-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.mast-foot-l { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
+.mast-foot-r { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: var(--sub); }
+
+/* ─── SWITCHER ─── */
+.switcher { display: grid; grid-template-columns: 1fr auto 1fr; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; margin-bottom: 52px; opacity: 0; transform: translateY(16px); animation: rise 0.6s ease 0.15s forwards; }
+.sw { padding: 13px 16px; background: transparent; border: none; color: var(--muted); font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.sw:not(:last-child) { border-right: 1px solid var(--rule); }
+.sw:hover { background: var(--surface); color: var(--silver); }
+.sw.al { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border) !important; }
+.sw.ab { background: var(--surface); color: var(--silver); }
+.sw.as { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border) !important; }
+
+/* ─── CHAPTER ─── */
+.chapter { margin-top: 44px; opacity: 0; transform: translateY(14px); }
+.chapter.vis { animation: rise 0.55s ease forwards; }
+.ch-head { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--rule); position: relative; }
+.ch-head::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 56px; height: 1px; background: var(--gold); }
+.ch-n { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--gold); opacity: 0.65; }
+.ch-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 600; letter-spacing: 0.055em; text-transform: uppercase; color: var(--chalk); }
+.ch-count { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: var(--muted); transition: color 0.3s; }
+.ch-count.done-all { color: var(--green-text); }
+
+/* ─── SUB HEADING ─── */
+.sub-h { display: flex; align-items: center; gap: 14px; padding: 20px 0 10px 56px; }
+.sub-h-line { width: 18px; height: 1px; background: var(--rule); }
+.sub-h-text { font-family: 'Syne Mono', monospace; font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); }
+.sub-h-tag { font-family: 'Syne Mono', monospace; font-size: 8px; letter-spacing: 0.12em; padding: 2px 8px; border-radius: 1px; border: 1px solid; }
+.t-long { color: var(--green-text); border-color: var(--green-border); background: var(--green-bg); }
+.t-short { color: var(--red-text); border-color: var(--red-border); background: var(--red-bg); }
+
+/* ─── ITEMS ─── */
+.items { padding-left: 56px; }
+.item {
+  display: grid; grid-template-columns: 18px 1fr; gap: 18px; align-items: start;
+  padding: 14px 16px 14px 0; border-bottom: 1px solid rgba(34,34,34,0.9);
+  cursor: pointer; transition: background 0.12s, margin 0.12s, padding 0.12s; position: relative;
+  user-select: none; -webkit-user-select: none;
+}
+.item:last-child { border-bottom-color: transparent; }
+.item:hover { background: var(--surface); margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-bottom-color: transparent; }
+.item:hover .box { border-color: var(--sub); }
+.item.done { opacity: 0.38; }
+.item.done .i-title { text-decoration: line-through; text-decoration-color: var(--muted); }
+.item.done .box { background: var(--mid); border-color: var(--mid); }
+.item.done .box::after { opacity: 1; transform: rotate(45deg) scale(1); }
+.item.done .m-num::before { content: '✓ '; }
+.item.done .m-num { color: var(--green-text); opacity: 0.5; }
+.m-num { position: absolute; left: -38px; top: 16px; font-family: 'Syne Mono', monospace; font-size: 8px; letter-spacing: 0.08em; color: var(--rule); transition: color 0.15s; }
+.item:hover .m-num { color: var(--muted); }
+
+/* box */
+.box { width: 16px; height: 16px; border: 1px solid var(--mid); border-radius: 1px; margin-top: 3px; flex-shrink: 0; position: relative; transition: all 0.14s; }
+.box::after { content: ''; position: absolute; top: 2px; left: 5px; width: 4px; height: 7px; border: 1.5px solid var(--chalk); border-top: none; border-left: none; transform: rotate(45deg) scale(0.4); opacity: 0; transition: all 0.11s ease; }
+
+.i-body { padding-top: 1px; }
+.i-cat { font-family: 'Syne Mono', monospace; font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.i-title { font-family: 'Syne', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--silver); line-height: 1.42; margin-bottom: 6px; }
+.i-desc { font-family: 'Cormorant Garamond', serif; font-size: 15.5px; font-weight: 300; color: var(--sub); line-height: 1.68; }
+.i-desc strong { color: var(--silver); font-weight: 400; }
+.i-desc em { font-style: italic; color: var(--ghost); }
+
+.badge { display: inline-block; font-family: 'Syne Mono', monospace; font-size: 7.5px; letter-spacing: 0.18em; padding: 2px 8px; border: 1px solid var(--gold-line); color: var(--gold); background: var(--gold-dim); border-radius: 1px; margin-left: 8px; vertical-align: middle; position: relative; top: -1.5px; text-transform: uppercase; }
+
+/* direction hide */
+body.mode-long .short-only { display: none !important; }
+body.mode-short .long-only { display: none !important; }
+
+/* ─── BOTTOM VERDICT ─── */
+.verdict { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: var(--ink); border-top: 1px solid var(--rule); }
+.verdict-inner { max-width: 800px; margin: 0 auto; padding: 0 32px; height: 64px; display: grid; grid-template-columns: 1fr auto auto; align-items: stretch; }
+.v-progress { display: flex; align-items: center; gap: 20px; padding-right: 32px; border-right: 1px solid var(--rule); }
+.v-prog-label { font-family: 'Syne Mono', monospace; font-size: 8.5px; letter-spacing: 0.22em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+.v-track { flex: 1; height: 2px; background: var(--rule); position: relative; }
+.v-fill { height: 100%; background: linear-gradient(90deg, var(--silver), var(--white)); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; position: relative; }
+.v-fill::after { content: ''; position: absolute; right: -1px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--white); box-shadow: 0 0 10px rgba(255,255,255,0.35); opacity: 0; transition: opacity 0.3s; }
+.v-fill.show-dot::after { opacity: 1; }
+.v-pct { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--silver); min-width: 36px; text-align: right; white-space: nowrap; }
+.v-score { display: flex; align-items: center; gap: 6px; padding: 0 32px; border-right: 1px solid var(--rule); }
+.v-num { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; line-height: 1; color: var(--chalk); }
+.v-slash { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--muted); font-weight: 300; }
+.v-tot { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--muted); }
+.v-call { display: flex; flex-direction: column; justify-content: center; padding-left: 32px; min-width: 155px; }
+.v-verdict { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; transition: color 0.35s; }
+.v-sub { font-family: 'Syne Mono', monospace; font-size: 8px; letter-spacing: 0.14em; color: var(--muted); margin-top: 3px; text-transform: uppercase; }
+.st-wait { color: var(--muted); }
+.st-caution { color: var(--amber); }
+.st-go { color: var(--green-text); }
+
+.reset-btn { position: fixed; bottom: 72px; right: 32px; z-index: 101; background: none; border: 1px solid var(--rule); color: var(--muted); font-family: 'Syne Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; padding: 8px 14px; cursor: pointer; border-radius: 1px; transition: all 0.15s; }
+.reset-btn:hover { border-color: var(--sub); color: var(--silver); }
+
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+@keyframes checkPulse { 0%{transform:scale(1)} 40%{transform:scale(0.95)} 70%{transform:scale(1.03)} 100%{transform:scale(1)} }
+.item.pulse { animation: checkPulse 0.22s ease; }
+
+@media (max-width: 580px) {
+  .page { padding: 0 20px 140px; }
+  .mast-h1 { font-size: 58px; }
+  .v-score { display: none; }
+  .verdict-inner { grid-template-columns: 1fr auto; }
+  .v-call { padding-left: 20px; min-width: 120px; }
+  .reset-btn { right: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-rule"></div>
+  <div class="mast-eyebrow">
+    <span class="ey-label">Trend Line Strategy</span>
+    <span class="ey-sep"></span>
+    <span class="ey-sub">4H Primary · Top-Down · 1M → 1W → 1D → 4H</span>
+  </div>
+  <h1 class="mast-h1">
+    <em>The</em>
+    <span class="word">Perfect Trade</span>
+    <em>Check-List</em>
+  </h1>
+  <div class="mast-foot">
+    <span class="mast-foot-l">Her işlemden önce eksiksiz tamamlanmalıdır · v2.0</span>
+    <span class="mast-foot-r">Disiplin, strateji kadar değerlidir.</span>
+  </div>
+</div>
+
+<!-- ══ SWITCHER ══ -->
+<div class="switcher">
+  <button class="sw" id="btn-long"  onclick="setMode('long')">▲ &nbsp;Long Position</button>
+  <button class="sw" id="btn-both"  onclick="setMode('both')">◈ &nbsp;Her İkisi</button>
+  <button class="sw" id="btn-short" onclick="setMode('short')">▼ &nbsp;Short Position</button>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 01 — COİN SEÇİM KRİTERLERİ           -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch1">
+  <div class="ch-head">
+    <span class="ch-n">01 —</span>
+    <span class="ch-title">Coin Seçim Kriterleri</span>
+    <span class="ch-count" id="cnt1">0 / 4</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch1')">
+      <span class="m-num">01</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">İşlem Hacmi</div>
+        <div class="i-title">Yüksek hacimli, üst sıra coin seçildi</div>
+        <div class="i-desc">Coin <strong>piyasa değeri sıralamasında üst sıralarda</strong> yer alıyor ve günlük işlem hacmi yeterince yüksek. Düşük hacimli coinler trend çizgilerinde <em>yanıltıcı fiyat hareketleri</em> oluşturur ve sinyal güvenilirliğini zayıflatır.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch1')">
+      <span class="m-num">02</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Trend Yapısı</div>
+        <div class="i-title">Net, düzenli ve saygılı trend yapısı mevcut</div>
+        <div class="i-desc">Grafikte <strong>belirgin daha yüksek dipler (uptrend)</strong> veya <strong>daha düşük tepeler (downtrend)</strong> oluşuyor. Fiyat trend çizgilerine yaklaştığında tepki veriyor. Aşırı volatil, sürekli ani sıçrayan coinler bu strateji için <em>uygun değildir.</em></div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch1')">
+      <span class="m-num">03</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Likidite</div>
+        <div class="i-title">Majör borsada derin emir defteri</div>
+        <div class="i-desc">Coin <strong>majör borsalarda işlem görüyor</strong> ve emir defteri yeterince derin. Düşük likidite belirlenen <strong>Stop Loss ve Take Profit</strong> seviyelerinde slippage riskine yol açar; tüm risk yönetim kurallarını işlevsiz kılar.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch1')">
+      <span class="m-num">04</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Fundamental Filtre</div>
+        <div class="i-title">Aktif proje — ciddi sorun yok</div>
+        <div class="i-desc">Proje aktif, geliştirme ekibi dağılmamış, yasal sorun bulunmuyor. Strateji teknik analiz temelli olsa da <strong>fundamental çöküş yaşayan bir coinde teknik sinyaller anlamsızlaşır.</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 02 — TRADİNGVİEW HAZIRLIĞI           -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch2">
+  <div class="ch-head">
+    <span class="ch-n">02 —</span>
+    <span class="ch-title">TradingView Hazırlığı</span>
+    <span class="ch-count" id="cnt2">0 / 3</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch2')">
+      <span class="m-num">05</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Çizim Aracı <span class="badge">Zorunlu</span></div>
+        <div class="i-title">Işın (Ray) aracı seçili — Trend Line değil</div>
+        <div class="i-desc">Sol menüden <strong>Ray aracı</strong> seçildi. Trend Line aracı değil — Ray aracı çizginin <em>sonsuz şekilde uzamasını</em> sağlar ve trendin gelecekteki olası yolunu görselleştirmede kritik rol oynar.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch2')">
+      <span class="m-num">06</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Manyetik Mod <span class="badge">Zorunlu</span></div>
+        <div class="i-title">Magnet Mode aktif — mıknatıs simgesi açık</div>
+        <div class="i-desc">Üst menüdeki <strong>mıknatıs simgesi aktif.</strong> Çizilen trend çizgileri mum yüksek/düşük noktalarına otomatik yapışıyor. Magnet Mode kapalıysa <strong>tüm çizimler hatalıdır</strong> ve strateji uygulanamaz.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch2')">
+      <span class="m-num">07</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Gösterge Temizliği</div>
+        <div class="i-title">Yalnızca fiyat mum çubukları + hacim görünüyor</div>
+        <div class="i-desc">Ekranda yalnızca <strong>fiyat mum çubukları, hacim çubukları ve trend çizgileri</strong> yer alıyor. Hiçbir teknik indikatör eklenmedi. Gösterge kalabalığı dikkat dağıtır ve stratejinin saf yapısını bozar.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 03 — TOP-DOWN ANALİZ                 -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch3">
+  <div class="ch-head">
+    <span class="ch-n">03 —</span>
+    <span class="ch-title">Top-Down Analiz & Trend Çizgileri</span>
+    <span class="ch-count" id="cnt3">0 / 5</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch3')">
+      <span class="m-num">08</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Aylık (1M)</div>
+        <div class="i-title">A→B trend çizgisi çizildi — min. 3 temas teyitli</div>
+        <div class="i-desc">En düşük/yüksek nokta <strong>A</strong>, trend çizgisini kesmeden önceki son uygun dip/tepe <strong>B</strong> olarak belirlendi. Ray ile A→B çizildi. <strong>Minimum 3 temas kontrol edildi.</strong> 3 temas yoksa çizgi yanlış yerleştirilmiştir, yeniden çizildi.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch3')">
+      <span class="m-num">09</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Haftalık (1W)</div>
+        <div class="i-title">A→B trend çizgisi çizildi — min. 3 temas teyitli</div>
+        <div class="i-desc">Haftalık grafikte aynı A-B kuralı uygulandı. <strong>Minimum 3 temas doğrulandı.</strong></div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch3')">
+      <span class="m-num">10</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Günlük (1D)</div>
+        <div class="i-title">A→B trend çizgisi çizildi — min. 3 temas teyitli</div>
+        <div class="i-desc">Günlük grafikte A-B trend çizgisi tamamlandı. <strong>Minimum 3 temas doğrulandı.</strong></div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch3')">
+      <span class="m-num">11</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">4 Saatlik (4H) — Ana İşlem Çizgisi</div>
+        <div class="i-title">A→B çizgisi hazır + tüm üst çizgiler görünür ve işaretli</div>
+        <div class="i-desc">4H grafikte trend çizgisi çizildi, <strong>min. 3 temas var.</strong> Tüm üst zaman dilimi çizgileri (1M, 1W, 1D) <strong>farklı renk veya kalınlıkla görünür durumda.</strong> Üst zaman dilimi çizgilerinin kırılması/sıçraması 4H sinyallerine ekstra ağırlık katar.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch3')">
+      <span class="m-num">12</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Yelpaze Tekniği</div>
+        <div class="i-title">Kesilen eski çizgiler güncellendi — eski B → yeni A</div>
+        <div class="i-desc">Herhangi bir trend çizgisi fiyat tarafından <strong>kesilmişse</strong> geçerliliğini yitirdi. Eski <strong>B Noktası yeni A Noktası</strong> olarak kullanılarak yeni trend çizgisi çizildi. <em>Güncellenmeyen çizgiler yanlış sinyal üretir.</em></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 04 — GİRİŞ SİNYALİ                  -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch4">
+  <div class="ch-head">
+    <span class="ch-n">04 —</span>
+    <span class="ch-title">Giriş Sinyali Teyidi</span>
+    <span class="ch-count" id="cnt4">0 / 9</span>
+  </div>
+
+  <!-- LONG -->
+  <div class="long-only">
+    <div class="sub-h"><div class="sub-h-line"></div><span class="sub-h-text">Long — Sıçrama Stratejisi</span><span class="sub-h-tag t-long">▲ Bounce</span></div>
+    <div class="items" style="position:relative">
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">13</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">4H grafikte yukarı trend çizgisi geçerli ve mevcut</div>
+          <div class="i-desc">Çizgi aktif, min. 3 temas var, geçerliliğini koruyor.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">14</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Temas mumunun kapanışı beklendi — sonraki 4H mum yukarı açıldı</div>
+          <div class="i-desc">Fiyat trend çizgisine temas eden mumun kapanışı beklendi. Bir sonraki 4H mum <strong>yukarı yönde açıldı</strong> — sıçrama ilk teyidini aldı.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">15</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Sıçrama teyidi: kapanış çizginin üzerinde + daha yüksek dip</div>
+          <div class="i-desc">Yeni mumun kapanışı <strong>trend çizgisinin üzerinde</strong> ve önceki mumun en düşüğünden <strong>daha yüksek dip</strong> oluşturdu. Her iki koşul aynı anda sağlanmalıdır.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">16</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Sıçrama mumunda hacim artışı teyit edildi</div>
+          <div class="i-desc">Sıçrama mumunun hacmi <strong>önceki mumlara göre belirgin şekilde artmış.</strong> Hacim artışı olmayan sıçrama sinyalleri zayıftır ve reddedilir.</div>
+        </div>
+      </div>
+    </div>
+    <div class="sub-h"><div class="sub-h-line"></div><span class="sub-h-text">Long — Kırılma Stratejisi</span><span class="sub-h-tag t-long">▲ Breakout</span></div>
+    <div class="items" style="position:relative">
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">17</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">4H'te aşağı trend çizgisi yukarı yönde kırıldı — mum üzerinde kapandı</div>
+          <div class="i-desc">Fiyat <strong>aşağı trend çizgisini yukarı yönde kırdı</strong> ve kırılma mumu <strong>tam olarak trend çizgisinin üzerinde kapandı.</strong> Kapanış üzerinde değilse kırılma geçersizdir, işlem açılmaz.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">18</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Kırılma mumunda yüksek hacim teyidi</div>
+          <div class="i-desc">Kırılma mumunun hacmi önceki mumlara göre <strong>artmış.</strong> Düşük hacimli kırılmalar <em>sahte kırılma (false breakout)</em> riski taşır — bu tür sinyaller reddedilir.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">19</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Üst zaman dilimi teyidi var mı? <span class="badge">Öncelik</span></div>
+          <div class="i-desc">Kırılan çizgi <strong>Günlük veya Haftalık</strong> zaman diliminden geliyorsa sinyal çok daha güçlü. Bu tür sinyallere öncelik verilir ve ilk işlem seçeneği olarak değerlendirilir.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT -->
+  <div class="short-only">
+    <div class="sub-h"><div class="sub-h-line"></div><span class="sub-h-text">Short — Sıçrama Stratejisi</span><span class="sub-h-tag t-short">▼ Bounce</span></div>
+    <div class="items" style="position:relative">
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">13</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">4H grafikte aşağı trend çizgisi geçerli ve mevcut</div>
+          <div class="i-desc">Çizgi aktif, min. 3 temas var, geçerliliğini koruyor.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">14</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Temas mumunun kapanışı beklendi — sonraki 4H mum aşağı açıldı</div>
+          <div class="i-desc">Fiyat trend çizgisine temas eden mumun kapanışı beklendi. Bir sonraki 4H mum <strong>aşağı yönde açıldı</strong> — sıçrama ilk teyidini aldı.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">15</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Sıçrama teyidi: kapanış çizginin altında + daha düşük tepe</div>
+          <div class="i-desc">Yeni mumun kapanışı <strong>trend çizgisinin altında</strong> ve önceki mumun en yükseğinden <strong>daha düşük tepe</strong> oluşturdu.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">16</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Sıçrama mumunda hacim artışı teyit edildi</div>
+          <div class="i-desc">Sıçrama mumunun hacmi <strong>belirgin şekilde artmış.</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="sub-h"><div class="sub-h-line"></div><span class="sub-h-text">Short — Kırılma Stratejisi</span><span class="sub-h-tag t-short">▼ Breakout</span></div>
+    <div class="items" style="position:relative">
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">17</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">4H'te yukarı trend çizgisi aşağı yönde kırıldı — mum altında kapandı</div>
+          <div class="i-desc">Fiyat <strong>yukarı trend çizgisini aşağı yönde kırdı</strong> ve kırılma mumu <strong>tam olarak trend çizgisinin altında kapandı.</strong> Kapanış altında değilse kırılma geçersizdir.</div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">18</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Kırılma mumunda yüksek hacim teyidi</div>
+          <div class="i-desc">Kırılma mumunun hacmi önceki mumlara göre <strong>artmış.</strong></div>
+        </div>
+      </div>
+      <div class="item" onclick="chk(this,'ch4')">
+        <span class="m-num">19</span><div class="box"></div>
+        <div class="i-body">
+          <div class="i-title">Üst zaman dilimi teyidi var mı? <span class="badge">Öncelik</span></div>
+          <div class="i-desc">Kırılan çizgi <strong>Günlük veya Haftalık</strong> zaman diliminden geliyorsa sinyal çok daha güçlü ve önceliklidir.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HER İKİSİ — ek filtre -->
+  <div class="sub-h"><div class="sub-h-line"></div><span class="sub-h-text">Ek Güç Filtresi</span></div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch4')">
+      <span class="m-num">—</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-title">4H sinyaliyle eş zamanlı Günlük/Haftalık sinyal çakışması var <span class="badge">Güçlü</span></div>
+        <div class="i-desc">4H grafikte aynı anda üst zaman diliminden de kırılma veya sıçrama sinyali geliyorsa bu işlem <strong>en yüksek önceliği</strong> taşır.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 05 — RİSK YÖNETİMİ                  -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch5">
+  <div class="ch-head">
+    <span class="ch-n">05 —</span>
+    <span class="ch-title">Risk Yönetimi & Stop Loss</span>
+    <span class="ch-count" id="cnt5">0 / 4</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch5')">
+      <span class="m-num">20</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">SL — Sıçrama</div>
+        <div class="i-title long-only">Stop Loss sıçrama mumunun en düşüğünün %0.5–%1 altına kondu</div>
+        <div class="i-title short-only">Stop Loss sıçrama mumunun en yükseğinin birkaç pips üstüne kondu</div>
+        <div class="i-desc long-only">Sıçrama ile Long: Stop Loss <strong>sıçrama yapılan mumun en düşük noktasının %0.5 ila %1 altına</strong> yerleştirildi. Fiyat trend çizgisini gerçekten kırarsa pozisyon otomatik kapanır.</div>
+        <div class="i-desc short-only">Sıçrama ile Short: Stop Loss <strong>sıçrama yapılan mumun en yüksek noktasının birkaç pips üstüne</strong> yerleştirildi.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch5')">
+      <span class="m-num">21</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">SL — Kırılma</div>
+        <div class="i-title long-only">Stop Loss kırılan aşağı trend çizgisinin altına, kırılma mumu altına kondu</div>
+        <div class="i-title short-only">Stop Loss kırılan yukarı trend çizgisinin üstüne, kırılma mumu üstüne kondu</div>
+        <div class="i-desc long-only">Kırılma ile Long: Stop Loss kırılan aşağı trend çizgisinin altına, <strong>kırılma mumunun en düşüğünün birkaç pips aşağısına</strong> konuldu. Fiyat geri dönerse trend dönüşü gerçekleşmemiştir.</div>
+        <div class="i-desc short-only">Kırılma ile Short: Stop Loss kırılan yukarı trend çizgisinin üstüne, <strong>kırılma mumunun en yükseğinin birkaç pips yukarısına</strong> yerleştirildi.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch5')">
+      <span class="m-num">22</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Pozisyon Büyüklüğü <span class="badge">Zorunlu</span></div>
+        <div class="i-title">Hesap sermayesinin %1–%2'si risk hesaplandı ve ayarlandı</div>
+        <div class="i-desc">Giriş ile Stop Loss arası mesafe pip olarak ölçüldü. Bu mesafeye göre <strong>hesap sermayesinin max %1–%2'si riske edilecek şekilde</strong> pozisyon büyüklüğü hesaplandı. <em>Örn: 10.000 USD → işlem başına 100–200 USD max risk.</em> Hesaplama yapılmadan işlem açılmaz.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch5')">
+      <span class="m-num">23</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Anında Yerleştirme <span class="badge">Zorunlu</span></div>
+        <div class="i-title">SL emri platforma girildi — pozisyon açılır açılmaz</div>
+        <div class="i-desc">Stop Loss emri <strong>pozisyon açılır açılmaz</strong> platforma girildi. <em>Gecikmeli yerleştirme kabul edilemez.</em> Bu, stratejinin risk kontrol ve karlılık sağlama mekanizmasıdır.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 06 — TAKE PROFIT & KÂR YÖNETİMİ    -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch6">
+  <div class="ch-head">
+    <span class="ch-n">06 —</span>
+    <span class="ch-title">Take Profit & Kâr Yönetimi</span>
+    <span class="ch-count" id="cnt6">0 / 3</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch6')">
+      <span class="m-num">24</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Yöntem A — Trailing Stop</div>
+        <div class="i-title long-only">Stop Loss yukarı trend çizgisi boyunca yukarı kaydırılacak</div>
+        <div class="i-title short-only">Stop Loss aşağı trend çizgisi boyunca aşağı kaydırılacak</div>
+        <div class="i-desc long-only">Her yeni 4H mum kapandığında, fiyat yükseliyor ve trend çizgisine yakın <strong>yeni bir dip oluşturuyorsa SL bu yeni dip noktasının altına</strong> taşınır. Kâr kilitlenir, trend tersine dönünce pozisyon otomatik kapanır.</div>
+        <div class="i-desc short-only">Her yeni 4H mum kapandığında, fiyat düşüyor ve trend çizgisine yakın <strong>yeni bir tepe oluşturuyorsa SL bu yeni tepe noktasının üstüne</strong> taşınır.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch6')">
+      <span class="m-num">25</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Yöntem B — Destek / Direnç</div>
+        <div class="i-title long-only">Take Profit en yakın direnç seviyesinin hemen altına kondu</div>
+        <div class="i-title short-only">Take Profit en yakın destek seviyesinin hemen üstüne kondu</div>
+        <div class="i-desc long-only">Grafik üzerinde yukarıda bulunan en yakın <strong>direnç seviyesi</strong> (geçmişte fiyatın güçlü tepki verdiği yatay bölge) tespit edildi. Take Profit bu seviyenin <strong>hemen altına</strong> yerleştirildi.</div>
+        <div class="i-desc short-only">Grafik üzerinde aşağıda bulunan en yakın <strong>destek seviyesi</strong> tespit edildi. Take Profit bu seviyenin <strong>hemen üstüne</strong> konuldu.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch6')">
+      <span class="m-num">26</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Kısmi Kâr Alma</div>
+        <div class="i-title">Kısmi kâr & başabaş planı hazırlandı</div>
+        <div class="i-desc">Fiyat belirli bir mesafe kat ettiğinde <strong>pozisyonun yarısı kapatılacak</strong> ve Stop Loss başabaş noktasına (giriş fiyatına) çekilecek. Kalan pozisyon <em>sıfır riskle</em> açık kalır ve ek kâr potansiyeli korunur.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 07 — PSİKOLOJİ & DİSİPLİN           -->
+<!-- ══════════════════════════════════════ -->
+<div class="chapter" id="ch7">
+  <div class="ch-head">
+    <span class="ch-n">07 —</span>
+    <span class="ch-title">Psikoloji & Disiplin</span>
+    <span class="ch-count" id="cnt7">0 / 6</span>
+  </div>
+  <div class="items" style="position:relative">
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">27</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Kural Bütünlüğü</div>
+        <div class="i-title">Tüm kurallar eksiksiz karşılandı — tek bir istisna yok</div>
+        <div class="i-desc">Strateji kuralları <strong>tam olarak uygulandı.</strong> <em>"Bu sefer farklı"</em> veya <em>"Sadece bu işlemde esnet"</em> düşüncesi yok. Kuralları tek bir kez ihlal etmek <strong>davranışsal kaymayı başlatır</strong> ve stratejinin bütünlüğünü geri döndürülemez biçimde bozar.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">28</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Sinyal Kalitesi</div>
+        <div class="i-title">Bu sinyal stratejinin TÜM koşullarını tam karşılıyor</div>
+        <div class="i-desc">Sinyal <strong>eksiksiz uygun.</strong> Kısmen uygun sinyaller işleme alınmaz. <em>Sabırsızlık en büyük düşmandır</em> — uygun sinyal oluşana kadar beklenildi. Piyasada sürekli işlem yapmak zorunluluğu yoktur.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">29</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Tek Zaman Dilimi Kuralı</div>
+        <div class="i-title">Sinyal, giriş ve yönetim yalnızca 4H zaman diliminde</div>
+        <div class="i-desc">Sinyal üretimi, giriş, çıkış ve pozisyon yönetimi yalnızca <strong>4H zaman diliminde</strong> yapılıyor. Başka zaman dilimlerindeki mumlar ve sinyaller <em>görmezden geliniyor.</em> Bu kural analiz tutarlılığını korur.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">30</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Duygusal Kontrol</div>
+        <div class="i-title">Ekranı sürekli izlemeyeceğim — sadece 4H kapanışta kontrol</div>
+        <div class="i-desc">SL ve TP yerleştirildi. Pozisyon açıldıktan sonra ekranı sürekli izlemek <strong>psikolojik stres yaratır ve disiplinsiz müdahalelere yol açar.</strong> Kontrol yalnızca her <em>4H mum kapanışında</em> yapılacak.</div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">31</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">Olasılıksal Düşünce</div>
+        <div class="i-title">Bu işlem kaybedebilir — ve bu tamamen normaldir</div>
+        <div class="i-desc">Her işlem bir olasılıktır. <strong>Kayıp işlemler normaldir, strateji hatası değildir.</strong> Önemli olan uzun vadede stratejinin pozitif beklenti değeri sunmasıdır. Ardı ardına birkaç kayıp gelse de stratejiden <em>sapılmayacak.</em></div>
+      </div>
+    </div>
+    <div class="item" onclick="chk(this,'ch7')">
+      <span class="m-num">32</span><div class="box"></div>
+      <div class="i-body">
+        <div class="i-cat">İşlem Günlüğü</div>
+        <div class="i-title">Bu işlem günlüğe kaydedilecek</div>
+        <div class="i-desc">Giriş nedeni, strateji türü (sıçrama/kırılma), <strong>giriş fiyatı, SL seviyesi, TP seviyesi, pozisyon büyüklüğü, sonuç ve öğrenilen ders</strong> günlüğe not alınacak. Bu, stratejinin performansını izleme ve hatalardan öğrenme mekanizmasıdır.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<!-- ══ VERDICT STRIP ══ -->
+<div class="verdict">
+  <div class="verdict-inner">
+    <div class="v-progress">
+      <span class="v-prog-label">İlerleme</span>
+      <div class="v-track"><div class="v-fill" id="vFill"></div></div>
+      <span class="v-pct" id="vPct">0%</span>
+    </div>
+    <div class="v-score">
+      <span class="v-num" id="vDone">0</span>
+      <span class="v-slash">/</span>
+      <span class="v-tot" id="vTotal">—</span>
+    </div>
+    <div class="v-call">
+      <div class="v-verdict st-wait" id="vVerdict">Bekle</div>
+      <div class="v-sub" id="vSub">Kontrolleri tamamla</div>
+    </div>
+  </div>
+</div>
+<button class="reset-btn" onclick="resetAll()">↺ &nbsp;Sıfırla</button>
+
+<script>
+// ── Service Worker (offline support) ──
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'perfect-trade-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './perfect-trade-checklist.html'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./'))));
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+// ── Persistent State ──
+function saveState() {
+  const states = {};
+  document.querySelectorAll('.item').forEach((el, i) => {
+    states[i] = el.classList.contains('done');
+  });
+  try { localStorage.setItem('ptcl-state', JSON.stringify({mode, states})); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ptcl-state') || 'null');
+    if (!saved) return;
+    if (saved.mode) setModeOnly(saved.mode);
+    if (saved.states) {
+      document.querySelectorAll('.item').forEach((el, i) => {
+        if (saved.states[i]) el.classList.add('done');
+      });
+    }
+  } catch(e) {}
+}
+
+let mode = 'both';
+
+function setModeOnly(m) {
+  mode = m;
+  document.body.className = m === 'both' ? '' : 'mode-' + m;
+  ['long','both','short'].forEach(x => {
+    const btn = document.getElementById('btn-' + x);
+    if (btn) btn.className = 'sw' + (x === m ? (x === 'long' ? ' al' : x === 'short' ? ' as' : ' ab') : '');
+  });
+}
+
+function setMode(m) {
+  setModeOnly(m);
+  saveState();
+  updateAll();
+}
+
+function chk(el, chId) {
+  el.classList.toggle('done');
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+  updateChapter(chId);
+  updateVerdict();
+  saveState();
+}
+
+function visibleItems() {
+  return [...document.querySelectorAll('.item')].filter(it => {
+    const p = it.closest('.long-only, .short-only');
+    if (!p) return true;
+    if (mode === 'long'  && p.classList.contains('short-only')) return false;
+    if (mode === 'short' && p.classList.contains('long-only'))  return false;
+    return true;
+  });
+}
+
+function chapterItems(chId) {
+  return [...document.querySelectorAll('#' + chId + ' .item')].filter(it => {
+    const p = it.closest('.long-only, .short-only');
+    if (!p) return true;
+    if (mode === 'long'  && p.classList.contains('short-only')) return false;
+    if (mode === 'short' && p.classList.contains('long-only'))  return false;
+    return true;
+  });
+}
+
+function updateChapter(chId) {
+  const items = chapterItems(chId);
+  const done = items.filter(i => i.classList.contains('done')).length;
+  const el = document.getElementById(chId.replace('ch', 'cnt'));
+  if (el) {
+    el.textContent = done + ' / ' + items.length;
+    el.classList.toggle('done-all', done === items.length && items.length > 0);
+  }
+}
+
+function updateVerdict() {
+  const items = visibleItems();
+  const done = items.filter(i => i.classList.contains('done')).length;
+  const total = items.length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  const fill = document.getElementById('vFill');
+  fill.style.width = pct + '%';
+  fill.classList.toggle('show-dot', pct > 0);
+  document.getElementById('vPct').textContent = pct + '%';
+  document.getElementById('vDone').textContent = done;
+  document.getElementById('vTotal').textContent = total;
+  const vv = document.getElementById('vVerdict');
+  const vs = document.getElementById('vSub');
+  if (pct < 50) { vv.textContent = 'Bekle'; vv.className = 'v-verdict st-wait'; vs.textContent = 'Kontrolleri tamamla'; }
+  else if (pct < 85) { vv.textContent = 'Dikkatli'; vv.className = 'v-verdict st-caution'; vs.textContent = 'Eksik kontroller var'; }
+  else if (pct < 100) { vv.textContent = 'Neredeyse'; vv.className = 'v-verdict st-caution'; vs.textContent = (total - done) + ' madde kaldı'; }
+  else { vv.textContent = 'İşleme Gir ↗'; vv.className = 'v-verdict st-go'; vs.textContent = 'Tüm koşullar karşılandı'; }
+}
+
+function updateAll() {
+  ['ch1','ch2','ch3','ch4','ch5','ch6','ch7'].forEach(updateChapter);
+  updateVerdict();
+}
+
+function resetAll() {
+  document.querySelectorAll('.item').forEach(el => el.classList.remove('done', 'pulse'));
+  updateAll();
+  saveState();
+}
+
+// staggered chapter reveal on load
+document.querySelectorAll('.chapter').forEach((ch, i) => {
+  setTimeout(() => ch.classList.add('vis'), 200 + i * 60);
+  ch.style.animationDelay = '0s';
+});
+
+// Load saved state, then init
+loadState();
+updateAll();
+</script>
+</body>
+</html>
